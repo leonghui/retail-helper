@@ -16,4 +16,4 @@ LOG_CONFIG = {
     "loggers": {"root": {"handlers": ["console"], "level": LOG_LEVEL}},
 }
 
-FRASERS_PAGE_LIMIT: int = int(os.environ.get("FRASERS_PAGE_LIMIT", "5"))
+DEFAULT_PAGE_LIMIT: int = int(os.environ.get("FRASERS_PAGE_LIMIT", "5"))
