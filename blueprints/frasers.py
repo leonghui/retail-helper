@@ -12,8 +12,7 @@ from niquests.sessions import Session
 from api.frasers.search_metadata import SearchMetadata, get_metadata
 from api.frasers.search_products import Product, get_products
 from api.utils import remove_query_param
-
-PAGE_LIMIT = 3
+from config import FRASERS_PAGE_LIMIT
 
 session: Session = niquests.Session(multiplexed=True)
 
@@ -44,7 +43,7 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
 
     products: list[Product] = []
 
-    last_page: int = min(metadata.pageCount, PAGE_LIMIT)
+    last_page: int = min(metadata.pageCount, FRASERS_PAGE_LIMIT)
 
     for page in range(1, last_page + 1):
         page_url: str = f"{new_url}&dcp={page}"
