@@ -1,9 +1,13 @@
+from http import HTTPStatus
 from logging.config import dictConfig
 
+from flask import jsonify
 from flask.app import Flask
+from flask.wrappers import Response
 
 from blueprints.frasers import frasers_blueprint
 # from blueprints.idealo import idealo_blueprint
+
 from config import LOG_CONFIG
 
 dictConfig(config=LOG_CONFIG)
@@ -15,6 +19,11 @@ def create_app() -> Flask:
     # Register each service blueprint under its own URL prefix
     # app.register_blueprint(blueprint=idealo_blueprint, url_prefix="/idealo")
     app.register_blueprint(blueprint=frasers_blueprint, url_prefix="/frasers")
+
+    @app.route(rule="/", methods=["GET"])
+    @app.route(rule="/healthcheck", methods=["GET"])
+    def healthcheck() -> tuple[Response, int]:
+        return jsonify({"status": "ok"}), HTTPStatus.OK
 
     return app
 
