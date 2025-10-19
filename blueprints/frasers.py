@@ -46,19 +46,18 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
 
     last_page: int = min(metadata.pageCount, page_limit)
 
+    page_responses: list[NiquestsResponse] = []
+
     for page in range(1, last_page + 1):
         page_url: str = f"{new_url}&dcp={page}"
 
         logging.info(msg=f"Querying page url: {page_url}")
-        page_response: NiquestsResponse = session.get(url=page_url, headers=headers)
+        page_responses.append(session.get(url=page_url, headers=headers))
 
-        if not page_response.text:
-            logging.warning(msg=f"No response for page {page}, stopping pagination")
-            break
-
-        page_products: list[Product] = get_products(page_response.text)
-
-        products.extend(page_products)
+    for response in page_responses:
+        if response.text:
+            page_products: list[Product] = get_products(response.text)
+            products.extend(page_products)
 
     products_dict: list[dict[str, Any]] = [product.model_dump() for product in products]
 
