@@ -23,7 +23,7 @@ metadata_pattern: Pattern[str] = compile(
 
 
 def get_metadata(text: str) -> SearchMetadata | None:
-    logging.info(msg="Extracting search metadata")
+    logging.debug(msg="Extracting search metadata")
 
     if not text:
         logging.warning(msg="Metadata input text missing")

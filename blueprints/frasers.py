@@ -51,7 +51,7 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     for page in range(1, last_page + 1):
         page_url: str = f"{new_url}&dcp={page}"
 
-        logging.info(msg=f"Querying page url: {page_url}")
+        logging.debug(msg=f"Querying page url: {page_url}")
         page_responses.append(session.get(url=page_url, headers=headers))
 
     for response in page_responses:

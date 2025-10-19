@@ -38,7 +38,7 @@ product_pattern: Pattern[str] = compile(
 
 
 def get_products(text: str) -> list[Product]:
-    logging.info(msg="Extracting products")
+    logging.debug(msg="Extracting products")
 
     products: list[Product] = []
 
