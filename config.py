@@ -17,7 +17,22 @@ LOG_CONFIG = {
 }
 
 DEFAULT_PAGE_LIMIT: int = int(os.environ.get("DEFAULT_PAGE_LIMIT", "5"))
+
 USER_AGENT: str = os.environ.get(
     "USER_AGENT",
     "Mozilla/5.0 (X11; Linux x86_64; rv:144.0) Gecko/20100101 Firefox/144.0",
 )
+
+DEFAULT_HEADERS: dict[str, str] = {
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept": "*/*",
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "Pragma": "no-cache",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "no-cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-GPC": "1",
+    "TE": "trailers",
+    "User-Agent": USER_AGENT,
+}

@@ -12,11 +12,14 @@ from niquests.sessions import Session
 from api.frasers.search_metadata import FrasersSearchMetadata, get_fr_metadata
 from api.frasers.search_products import FrasersProduct, get_fr_products
 from api.utils import remove_query_param
-from config import DEFAULT_PAGE_LIMIT
+from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
 
 session: Session = niquests.Session(multiplexed=True)
 
-headers: dict[str, str] = {"RSC": "1"}
+headers: dict[str, str] = DEFAULT_HEADERS | {
+    "Priority": "u=5",
+    "RSC": "1",
+}
 
 frasers_blueprint: Blueprint = Blueprint(name="frasers", import_name=__name__)
 

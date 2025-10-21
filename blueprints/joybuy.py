@@ -12,25 +12,14 @@ from niquests.sessions import Session
 from api.joybuy.search_metadata import JdSearchMetadata, get_jd_metadata
 from api.joybuy.search_products import JdProduct, get_jd_products
 from api.utils import remove_query_param
-from config import DEFAULT_PAGE_LIMIT, USER_AGENT
+from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
 
 session: Session = niquests.Session(multiplexed=True)
 
-headers: dict[str, str] = {
+headers: dict[str, str] = DEFAULT_HEADERS | {
     "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Accept": "*/*",
-    "Cache-Control": "no-cache",
-    "Connection": "keep-alive",
-    "Pragma": "no-cache",
     "Priority": "u=4",
     "RSC": "1",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "no-cors",
-    "Sec-Fetch-Site": "same-origin",
-    "Sec-GPC": "1",
-    "TE": "trailers",
-    "User-Agent": USER_AGENT,
 }
 
 joybuy_blueprint: Blueprint = Blueprint(name="joybuy", import_name=__name__)
