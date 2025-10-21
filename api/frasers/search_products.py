@@ -1,46 +1,48 @@
 import logging
 from json import loads
 from re import MULTILINE, Match, Pattern, compile
-from typing import Optional
 
 from pydantic import BaseModel
 
 
-class SizeVariant(BaseModel):
+class FrasersSizeVariant(BaseModel):
     description: str
     variantId: str
 
 
-class Product(BaseModel):
+class FrasersProduct(BaseModel):
     image: str
-    color: Optional[str] = None
+    color: str
     brand: str
     name: str
-    nameWithoutBrand: Optional[str] = None
-    sizeVariants: list[SizeVariant] = []
-    price: Optional[float] = None
-    discountedPrice: Optional[float] = None
-    productUrl: Optional[str] = None
-    key: str
-    category: list[str] = []
-    activity: list[str] = []
+    nameWithoutBrand: str
+    sizeVariants: list[FrasersSizeVariant]
+    price: float
+    discountedPrice: float
+    productUrl: str
+    key: int
+    category: list[str]
+    activity: list[str]
 
 
-class ProductQuery(BaseModel):
-    query: str
-    products: list[Product]
+class FrasersProductResult(BaseModel):
+    query: str | None = None
+    categoryCode: str | None = None
+    currency: str | None = None
+    locale: str | None = None
+    products: list[FrasersProduct]
 
 
 product_pattern: Pattern[str] = compile(
-    pattern=r'(^[0-9a-f]+\:\[\["\$","\$L\d+",null,)({"query":".*","products":.*"rolledupProducts":\[\]}\]})',
+    pattern=r'({"(query|categoryCode)":"\w*".*,"products":.*"rolledupProducts":\[\]}\][^}\]]*})',
     flags=MULTILINE,
 )
 
 
-def get_products(text: str) -> list[Product]:
+def get_fr_products(text: str) -> list[FrasersProduct]:
     logging.debug(msg="Extracting products")
 
-    products: list[Product] = []
+    products: list[FrasersProduct] = []
 
     if not text:
         logging.warning(msg="Product input text missing")
@@ -55,8 +57,8 @@ def get_products(text: str) -> list[Product]:
         return products
 
     try:
-        payload = loads(s=match.group(2))
-        pq: ProductQuery = ProductQuery(**payload)
+        payload = loads(s=match.group(1))
+        pq: FrasersProductResult = FrasersProductResult(**payload)
         return pq.products
     except Exception as exc:
         logging.exception(msg=f"Failed to parse product payload: {exc}")

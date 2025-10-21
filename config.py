@@ -17,3 +17,7 @@ LOG_CONFIG = {
 }
 
 DEFAULT_PAGE_LIMIT: int = int(os.environ.get("DEFAULT_PAGE_LIMIT", "5"))
+USER_AGENT: str = os.environ.get(
+    "USER_AGENT",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:144.0) Gecko/20100101 Firefox/144.0",
+)

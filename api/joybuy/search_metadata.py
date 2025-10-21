@@ -5,24 +5,27 @@ from re import MULTILINE, Match, Pattern, compile
 from pydantic import BaseModel
 
 
-class FrasersSearchMetadata(BaseModel):
-    currency: str
-    indexName: str
+class JdResultPage(BaseModel):
     pageCount: int
-    pageNumber: int
-    products: str
-    productsCount: int
-    queryId: str
-    relativeReference: str
+    pageIndex: int
+    pageSize: int
+
+
+class JdSearchMetadata(BaseModel):
+    orgSkuCount: int
+    resultCut: int
+    resultShowCount: int
+    resultCount: int
+    page: JdResultPage
 
 
 metadata_pattern: Pattern[str] = compile(
-    pattern=r'({("categoryCode":"\w+",)?"currency":".*"})(\]$)',
+    pattern=r'("data":{"head":{"summary":)({"orgSkuCount".*"pageSize":\d+}})',
     flags=MULTILINE,
 )
 
 
-def get_fr_metadata(text: str) -> FrasersSearchMetadata | None:
+def get_jd_metadata(text: str) -> JdSearchMetadata | None:
     logging.debug(msg="Extracting search metadata")
 
     if not text:
@@ -36,8 +39,8 @@ def get_fr_metadata(text: str) -> FrasersSearchMetadata | None:
         return None
 
     try:
-        payload = loads(s=match.group(1))
-        return FrasersSearchMetadata(**payload)
+        payload = loads(s=match.group(2))
+        return JdSearchMetadata(**payload)
     except Exception as exc:
         logging.exception(msg=f"Failed to parse metadata: {exc}")
         return None
