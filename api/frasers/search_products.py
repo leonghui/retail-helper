@@ -34,7 +34,7 @@ class FrasersProductResult(BaseModel):
 
 
 product_pattern: Pattern[str] = compile(
-    pattern=r'({"(query|categoryCode)":"\w*".*,"products":.*"rolledupProducts":\[\]}\][^}\]]*})',
+    pattern=r'({"(query|categoryCode)":".*,"products":.*"rolledupProducts":\[\]}\][^}\]]*})',
     flags=MULTILINE,
 )
 
