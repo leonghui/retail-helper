@@ -1,0 +1,34 @@
+from http import HTTPStatus
+import logging
+from urllib.parse import unquote_plus
+
+from flask import request
+from flask.blueprints import Blueprint
+from flask.wrappers import Response
+import niquests
+from niquests.models import Response as NiquestsResponse
+from niquests.sessions import Session
+
+session: Session = niquests.Session(disable_http1=True, multiplexed=True)
+
+generic_blueprint: Blueprint = Blueprint(name="generic", import_name=__name__)
+
+
+@generic_blueprint.route(rule="/proxy", methods=["GET"])
+def get_paged_products() -> tuple[Response | str, HTTPStatus]:
+    encoded_url: str | None = request.args.get("url")
+
+    if not encoded_url:
+        return "Invalid input", HTTPStatus.BAD_REQUEST
+
+    new_url: str = unquote_plus(string=encoded_url)
+
+    logging.info(msg=f"Fetching URL: {new_url}")
+    response: NiquestsResponse = session.get(
+        url=new_url, headers=dict[str, str](request.headers)
+    )
+
+    if response.text:
+        return response.text, HTTPStatus(value=response.status_code)
+    else:
+        return "No response", HTTPStatus.NO_CONTENT
