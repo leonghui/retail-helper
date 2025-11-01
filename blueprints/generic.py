@@ -15,7 +15,7 @@ generic_blueprint: Blueprint = Blueprint(name="generic", import_name=__name__)
 
 
 @generic_blueprint.route(rule="/proxy", methods=["GET"])
-def get_paged_products() -> tuple[Response | str, HTTPStatus]:
+def get_paged_products() -> tuple[Response | str | bytes, HTTPStatus]:
     encoded_url: str | None = request.args.get("url")
 
     if not encoded_url:
@@ -23,12 +23,14 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
 
     new_url: str = unquote_plus(string=encoded_url)
 
-    logging.info(msg=f"Fetching URL: {new_url}")
-    response: NiquestsResponse = session.get(
-        url=new_url, headers=dict[str, str](request.headers)
-    )
+    headers: dict[str, str] = dict[str, str](request.headers)
+    headers.pop("Host")
+    headers.pop("Accept-Encoding")
 
-    if response.text:
-        return response.text, HTTPStatus(value=response.status_code)
+    logging.info(msg=f"Fetching URL: {new_url}")
+    response: NiquestsResponse = session.get(url=new_url, headers=headers)
+
+    if response.content:
+        return response.content, HTTPStatus(value=response.status_code)
     else:
         return "No response", HTTPStatus.NO_CONTENT
