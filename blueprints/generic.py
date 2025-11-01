@@ -1,10 +1,16 @@
+from typing import Literal
+
+
+from flask.wrappers import Response
+
+
 from http import HTTPStatus
 import logging
 from urllib.parse import unquote_plus
 
 from flask import request
 from flask.blueprints import Blueprint
-from flask.wrappers import Response
+from flask.wrappers import Response as FlaskResponse
 import niquests
 from niquests.models import Response as NiquestsResponse
 from niquests.sessions import Session
@@ -15,7 +21,7 @@ generic_blueprint: Blueprint = Blueprint(name="generic", import_name=__name__)
 
 
 @generic_blueprint.route(rule="/proxy", methods=["GET"])
-def get_paged_products() -> tuple[Response | str | bytes, HTTPStatus]:
+def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     encoded_url: str | None = request.args.get("url")
 
     if not encoded_url:
@@ -28,9 +34,15 @@ def get_paged_products() -> tuple[Response | str | bytes, HTTPStatus]:
     headers.pop("Accept-Encoding")
 
     logging.info(msg=f"Fetching URL: {new_url}")
-    response: NiquestsResponse = session.get(url=new_url, headers=headers)
+    niquest_response: NiquestsResponse = session.get(url=new_url, headers=headers)
 
-    if response.content:
-        return response.content, HTTPStatus(value=response.status_code)
+    mimetype: str = niquest_response.headers.get("Content-Type", "text/html")
+
+    if niquest_response.content:
+        return FlaskResponse(
+            response=niquest_response.content,
+            mimetype=mimetype,
+        ), HTTPStatus(value=niquest_response.status_code)
+
     else:
         return "No response", HTTPStatus.NO_CONTENT
