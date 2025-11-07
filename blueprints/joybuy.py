@@ -11,8 +11,10 @@ from niquests.sessions import Session
 
 from api.joybuy.search_metadata import JdSearchMetadata, get_jd_metadata
 from api.joybuy.search_products import JdProduct, get_jd_products
-from api.utils import remove_query_param
+from api.utils import remove_query_param, is_valid_url
 from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+
+JOYBUY_ALLOWED_DOMAINS: list[str] = ["joybuy.co.uk"]
 
 session: Session = niquests.Session(multiplexed=True)
 
@@ -30,7 +32,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     encoded_url: str | None = request.args.get("url")
     page_limit: int | None = int(request.args.get("page_limit", DEFAULT_PAGE_LIMIT))
 
-    if not encoded_url:
+    if not encoded_url or not is_valid_url(
+        url=encoded_url, allowed_domains=JOYBUY_ALLOWED_DOMAINS
+    ):
         return "Invalid input", HTTPStatus.BAD_REQUEST
 
     new_url: str = remove_query_param(url=encoded_url, param="page")

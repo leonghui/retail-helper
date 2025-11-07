@@ -68,3 +68,11 @@ def remove_path_segment(url: str, segment: str) -> str:
 
     logging.debug(msg=f"Resulting URL: {result}")
     return result
+
+
+def is_valid_url(url: str | None, allowed_domains: list[str]) -> bool:
+    if not url:
+        return False
+
+    parsed: ParseResult = urlparse(url)
+    return parsed.scheme in {"http", "https"} and parsed.hostname in allowed_domains

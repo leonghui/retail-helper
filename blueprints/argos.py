@@ -11,8 +11,10 @@ from niquests.sessions import Session
 
 from api.argos.search_metadata import ArgosProductMetadata, get_argos_metadata
 from api.argos.search_products import ArgosProduct, get_argos_products
-from api.utils import remove_path_segment
+from api.utils import remove_path_segment, is_valid_url
 from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+
+ARGOS_ALLOWED_DOMAINS: list[str] = ["argos.co.uk", "www.argos.co.uk"]
 
 session: Session = niquests.Session(multiplexed=True)
 
@@ -29,7 +31,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     encoded_url: str | None = request.args.get("url")
     page_limit: int | None = int(request.args.get("page_limit", DEFAULT_PAGE_LIMIT))
 
-    if not encoded_url:
+    if not encoded_url or not is_valid_url(
+        url=encoded_url, allowed_domains=ARGOS_ALLOWED_DOMAINS
+    ):
         return "Invalid input", HTTPStatus.BAD_REQUEST
 
     new_url: str = remove_path_segment(url=encoded_url, segment="page")

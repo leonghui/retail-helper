@@ -11,8 +11,10 @@ from niquests.sessions import Session
 
 from api.frasers.search_metadata import FrasersSearchMetadata, get_fr_metadata
 from api.frasers.search_products import FrasersProduct, get_fr_products
-from api.utils import remove_query_param
+from api.utils import remove_query_param, is_valid_url
 from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+
+FRASERS_ALLOWED_DOMAINS: list[str] = ["houseoffraser.co.uk", "www.houseoffraser.co.uk"]
 
 session: Session = niquests.Session(multiplexed=True)
 
@@ -29,7 +31,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     encoded_url: str | None = request.args.get("url")
     page_limit: int | None = int(request.args.get("page_limit", DEFAULT_PAGE_LIMIT))
 
-    if not encoded_url:
+    if not encoded_url or not is_valid_url(
+        url=encoded_url, allowed_domains=FRASERS_ALLOWED_DOMAINS
+    ):
         return "Invalid input", HTTPStatus.BAD_REQUEST
 
     new_url: str = remove_query_param(url=encoded_url, param="dcp")

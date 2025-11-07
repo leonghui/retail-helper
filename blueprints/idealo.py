@@ -1,9 +1,14 @@
+from http import HTTPStatus
 import niquests
 from flask import Response as FlaskResponse
 from flask import request
 from flask.blueprints import Blueprint
 from flask.json import jsonify
 from niquests.models import Response as NiquestResponse
+
+from api.utils import is_valid_url
+
+IDEALO_ALLOWED_DOMAINS: list[str] = ["idealo.co.uk"]
 
 idealo_blueprint: Blueprint = Blueprint(name="idealo", import_name=__name__)
 
@@ -13,9 +18,6 @@ CUSTOM_HEADERS: dict[str, str] = {
     "User-Agent": user_agent,
     "Cookie": "xp_seed_s=f4ea2;",
 }
-
-
-# url = "https://www.idealo.co.uk/csr/api/v2/modules/searchResult?categoryId=4552&locale=en_GB&filters=102295028&sort=PRICE_ASC&itemStates=EXCLUDE_USED&query=64gb%20ddr5&priceFrom=0&priceTo=120"
 
 
 @idealo_blueprint.route(rule="/", methods=["POST"])
@@ -34,6 +36,12 @@ def proxy():
         return jsonify(error="Missing 'url' in JSON body"), 400
 
     target_url = data["url"]
+
+    if not target_url or not is_valid_url(
+        url=target_url, allowed_domains=IDEALO_ALLOWED_DOMAINS
+    ):
+        return "Invalid input", HTTPStatus.BAD_REQUEST
+
     # Merge optional extra headers with the service‑specific ones
     extra_headers = data.get("headers", {})
     headers: dict = {**CUSTOM_HEADERS, **extra_headers}
