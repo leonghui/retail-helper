@@ -79,7 +79,7 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
             ).model_dump()
         ]
 
-        logging.debug(msg=f"Querying page url: {url}")
+        logging.debug(msg=f"Querying page {page} for url: {url}")
         page_responses.append(session.post(url=url, headers=headers, json=page_payload))
 
     for response in page_responses:
