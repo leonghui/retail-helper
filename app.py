@@ -7,6 +7,7 @@ from flask.wrappers import Response
 
 # from blueprints.idealo import idealo_blueprint
 from blueprints.argos import argos_blueprint
+from blueprints.bargainfox import bargainfox_blueprint
 from blueprints.frasers import frasers_blueprint
 from blueprints.generic import generic_blueprint
 from blueprints.joybuy import joybuy_blueprint
@@ -22,6 +23,7 @@ def create_app() -> Flask:
     # Register each service blueprint under its own URL prefix
     # app.register_blueprint(blueprint=idealo_blueprint, url_prefix="/idealo")
     app.register_blueprint(blueprint=argos_blueprint, url_prefix="/argos")
+    app.register_blueprint(blueprint=bargainfox_blueprint, url_prefix="/bargainfox")
     app.register_blueprint(blueprint=frasers_blueprint, url_prefix="/frasers")
     app.register_blueprint(blueprint=generic_blueprint, url_prefix="/generic")
     app.register_blueprint(blueprint=joybuy_blueprint, url_prefix="/joybuy")

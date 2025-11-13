@@ -76,3 +76,10 @@ def is_valid_url(url: str | None, allowed_domains: list[str]) -> bool:
 
     parsed: ParseResult = urlparse(url)
     return parsed.scheme in {"http", "https"} and parsed.hostname in allowed_domains
+
+
+def get_search_params(encoded_url) -> dict[str, list[str]]:
+    parsed: ParseResult = urlparse(encoded_url)
+    params: dict[str, list[str]] = parse_qs(qs=parsed.query)
+
+    return params
