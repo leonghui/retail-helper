@@ -17,7 +17,7 @@ from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
 
 BARGAINFOX_ALLOWED_DOMAINS: list[str] = ["bargainfox.com"]
 
-session: Session = niquests.Session(disable_http2=True)
+session: Session = niquests.Session(multiplexed=True)
 
 headers: dict[str, str] = DEFAULT_HEADERS | {
     "Next-Action": "bcff783ffff24f29da1c2661721efdeca7b0d827",
@@ -68,18 +68,18 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
 
     products: list[BargainFoxProduct] = []
 
-    last_page: int = min(metadata.last_page, page_limit)
+    last_page: int = min(metadata.last_page, page_limit) if metadata.total else 0
 
     page_responses: list[NiquestsResponse] = []
 
-    for page in range(1, last_page + 1):
+    for page in range(0, last_page):
         page_payload: list[dict[str, Any]] = [
             BargainFoxSearchModel(
-                pageNumber=page, searchParams=search_params
+                pageNumber=page + 1, searchParams=search_params
             ).model_dump()
         ]
 
-        logging.debug(msg=f"Querying page {page} for url: {url}")
+        logging.debug(msg=f"Querying page {page + 1} for url: {url}")
         page_responses.append(session.post(url=url, headers=headers, json=page_payload))
 
     for response in page_responses:

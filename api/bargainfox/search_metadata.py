@@ -24,7 +24,7 @@ class BargainFoxResult(BaseModel):
     data: list[BargainFoxProduct]
     last_page: int
     per_page: int
-    to: int
+    to: int | None
     total: int
 
 
