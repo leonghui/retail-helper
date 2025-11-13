@@ -9,7 +9,7 @@ class BargainFoxSearchParams(BaseModel):
 class BargainFoxSearchModel(BaseModel):
     api_url: str = "/product/list"
     category: list[str] = []
-    limit: int = 300
+    limit: int = 30
     pageNumber: int
     searchParams: BargainFoxSearchParams | dict = {}
     authToken: str | None = None
