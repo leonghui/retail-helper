@@ -36,3 +36,5 @@ DEFAULT_HEADERS: dict[str, str] = {
     "TE": "trailers",
     "User-Agent": USER_AGENT,
 }
+
+TIMEOUT: int = int(os.environ.get("TIMEOUT", 45))

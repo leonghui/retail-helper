@@ -12,7 +12,7 @@ from niquests.sessions import Session
 from api.joybuy.search_metadata import JdSearchMetadata, get_jd_metadata
 from api.joybuy.search_products import JdProduct, get_jd_products
 from api.utils import remove_query_param, is_valid_url
-from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT, TIMEOUT
 
 JOYBUY_ALLOWED_DOMAINS: list[str] = ["joybuy.co.uk"]
 
@@ -40,7 +40,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     new_url: str = remove_query_param(url=encoded_url, param="page")
 
     logging.info(msg=f"Fetching initial URL: {new_url}")
-    initial_response: NiquestsResponse = session.get(url=new_url, headers=headers)
+    initial_response: NiquestsResponse = session.get(
+        url=new_url, headers=headers, timeout=TIMEOUT
+    )
 
     if not initial_response.text:
         return "No response from server", HTTPStatus.NO_CONTENT
@@ -60,7 +62,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
         page_url: str = f"{new_url}&page={page}"
 
         logging.debug(msg=f"Querying page url: {page_url}")
-        page_responses.append(session.get(url=page_url, headers=headers))
+        page_responses.append(
+            session.get(url=page_url, headers=headers, timeout=TIMEOUT)
+        )
 
     for response in page_responses:
         if response.text:

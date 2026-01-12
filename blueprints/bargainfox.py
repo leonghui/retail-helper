@@ -13,7 +13,7 @@ from api.bargainfox.search_metadata import BargainFoxResult, get_bargainfox_meta
 from api.bargainfox.search_model import BargainFoxSearchModel, BargainFoxSearchParams
 from api.bargainfox.search_products import BargainFoxProduct, get_bargainfox_products
 from api.utils import get_search_params, is_valid_url
-from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT, TIMEOUT
 
 BARGAINFOX_ALLOWED_DOMAINS: list[str] = ["bargainfox.com"]
 
@@ -52,7 +52,7 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
 
     logging.info(msg=f"Fetching initial URL: {url}")
     initial_response: NiquestsResponse = session.post(
-        url=url, headers=headers, json=initial_payload
+        url=url, headers=headers, json=initial_payload, timeout=TIMEOUT
     )
 
     if not initial_response.ok:
@@ -80,7 +80,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
         ]
 
         logging.debug(msg=f"Querying page {page + 1} for url: {url}")
-        page_responses.append(session.post(url=url, headers=headers, json=page_payload))
+        page_responses.append(
+            session.post(url=url, headers=headers, json=page_payload, timeout=TIMEOUT)
+        )
 
     for response in page_responses:
         if response.ok and response.text:

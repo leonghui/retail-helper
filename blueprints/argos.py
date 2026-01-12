@@ -12,7 +12,7 @@ from niquests.sessions import Session
 from api.argos.search_metadata import ArgosProductMetadata, get_argos_metadata
 from api.argos.search_products import ArgosProduct, get_argos_products
 from api.utils import remove_path_segment, is_valid_url
-from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT
+from config import DEFAULT_HEADERS, DEFAULT_PAGE_LIMIT, TIMEOUT
 
 ARGOS_ALLOWED_DOMAINS: list[str] = ["argos.co.uk", "www.argos.co.uk"]
 
@@ -39,7 +39,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
     new_url: str = remove_path_segment(url=encoded_url, segment="page")
 
     logging.info(msg=f"Fetching initial URL: {new_url}")
-    initial_response: NiquestsResponse = session.get(url=new_url, headers=headers)
+    initial_response: NiquestsResponse = session.get(
+        url=new_url, headers=headers, timeout=TIMEOUT
+    )
 
     if not initial_response.text:
         return "No response from server", HTTPStatus.NO_CONTENT
@@ -59,7 +61,9 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
         page_url: str = new_url if page == 1 else f"{new_url.rstrip('/')}/page:{page}/"
 
         logging.debug(msg=f"Querying page url: {page_url}")
-        page_responses.append(session.get(url=page_url, headers=headers))
+        page_responses.append(
+            session.get(url=page_url, headers=headers, timeout=TIMEOUT)
+        )
 
     for response in page_responses:
         if response.text:

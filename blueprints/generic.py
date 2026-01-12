@@ -1,14 +1,16 @@
-from http import HTTPStatus
 import logging
+from http import HTTPStatus
 from urllib.parse import unquote_plus
 
+import niquests
 from flask import request as FlaskRequest
 from flask.blueprints import Blueprint
 from flask.wrappers import Response
 from flask.wrappers import Response as FlaskResponse
-import niquests
 from niquests.models import Response as NiquestsResponse
 from niquests.sessions import Session
+
+from config import TIMEOUT
 
 session: Session = niquests.Session(multiplexed=False)
 
@@ -34,17 +36,22 @@ def get_paged_products() -> tuple[Response | str, HTTPStatus]:
         headers["Host"] = injected_host
 
     logging.info(msg=f"Fetching URL: {new_url}")
-    niquest_response: NiquestsResponse = session.get(
-        url=new_url, headers=headers, verify=verify_ssl
-    )
+    try:
+        niquest_response: NiquestsResponse = session.get(
+            url=new_url, headers=headers, verify=verify_ssl, timeout=TIMEOUT
+        )
 
-    mimetype: str = niquest_response.headers.get("Content-Type", "text/html")
+        mimetype: str = niquest_response.headers.get("Content-Type", "text/html")
 
-    if niquest_response.content:
-        return FlaskResponse(
-            response=niquest_response.content,
-            mimetype=mimetype,
-        ), HTTPStatus(value=niquest_response.status_code)
+        if niquest_response.content:
+            return FlaskResponse(
+                response=niquest_response.content,
+                mimetype=mimetype,
+            ), HTTPStatus(value=niquest_response.status_code)
 
-    else:
-        return "No response", HTTPStatus.NO_CONTENT
+        else:
+            return "No response", HTTPStatus.NO_CONTENT
+    except niquests.exceptions.ConnectionError:
+        error_msg: str = f"Error fetching URL:  {new_url}"
+        logging.error(msg=error_msg)
+        return error_msg, HTTPStatus.INTERNAL_SERVER_ERROR

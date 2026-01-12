@@ -7,6 +7,7 @@ from flask.json import jsonify
 from niquests.models import Response as NiquestResponse
 
 from api.utils import is_valid_url
+from config import TIMEOUT
 
 IDEALO_ALLOWED_DOMAINS: list[str] = ["idealo.co.uk"]
 
@@ -52,10 +53,10 @@ def proxy():
     try:
         if json_body:
             resp: NiquestResponse = niquests.post(
-                url=target_url, json=json_body, headers=headers, timeout=10
+                url=target_url, json=json_body, headers=headers, timeout=TIMEOUT
             )
         else:
-            resp = niquests.get(url=target_url, headers=headers, timeout=10)
+            resp = niquests.get(url=target_url, headers=headers, timeout=TIMEOUT)
     except niquests.RequestException as e:
         return jsonify(error=f"Error contacting target: {e}"), 502
 
