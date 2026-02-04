@@ -20,7 +20,7 @@ BARGAINFOX_ALLOWED_DOMAINS: list[str] = ["bargainfox.com"]
 session: Session = niquests.Session(multiplexed=True)
 
 headers: dict[str, str] = DEFAULT_HEADERS | {
-    "Next-Action": "bcff783ffff24f29da1c2661721efdeca7b0d827",
+    "Next-Action": "45e36c14a4f7bd18de3074a1f50a2a54033a5fe5",
     "Priority": "u=4",
 }
 
